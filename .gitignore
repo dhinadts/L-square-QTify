@@ -1,0 +1,23 @@
+# See https:/qtify//qtify/help.github.com/qtify/articles/qtify/ignoring-files/qtify/ for more about ignoring files.
+
+# dependencies
+/qtify/node_modules
+/qtify/.pnp
+/qtify/*.pnp.js
+
+# testing
+/qtify/coverage
+
+# production
+/qtify/build
+
+# misc
+/qtify/*.DS_Store
+/qtify/*.env.local
+/qtify/*.env.development.local
+/qtify/*.env.test.local
+/qtify/*.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
