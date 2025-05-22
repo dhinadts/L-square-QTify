@@ -2,54 +2,44 @@ import { InputAdornment, Box, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import CustomButton from "./CustomButton";
 import { useSnackbar } from "notistack";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 function Navbar() {
-  const {enqueueSnackbar} = useSnackbar();
-  const [timerId, udpateTimerId] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
+  const [timerId, updateTimerId] = useState(null);
   const [audiosList, updateAudios] = useState([]);
   const [audiosNotFound, updateAudiosNotFound] = useState(false);
-  const performSearch = async (text) => {
-      try {
-        // updateAudiosNotFound(false)
-        let url = 'config.endpoint';
-        let product = await axios
-          .get(`${url}/products/search?value=${text}`)
-          .catch((e) => {
-            updateAudiosNotFound(true);
-          });
-        if (product.data) {
-          updateAudiosNotFound(false);
-          updateAudios(product.data);
-        }
-      } catch (e) {
-        console.log(e);
-        enqueueSnackbar(e.response.data.message);
-      }
-    };
-  
-  const debounceSearch = (event, debounceTimeout) => {
-    clearTimeout(debounceTimeout);
-    // wait for 500 ms and make a call
-    // 1st request
-    let timerId = setTimeout(() => performSearch(event), 500);
-    udpateTimerId(timerId);
-  }; 
 
+  const performSearch = async (text) => {
+    try {
+      const url = "config.endpoint";
+      const product = await axios.get(`${url}/products/search?value=${text}`);
+      if (product.data) {
+        updateAudiosNotFound(false);
+        updateAudios(product.data);
+      }
+    } catch (e) {
+      updateAudiosNotFound(true);
+      enqueueSnackbar(e?.response?.data?.message || "Search failed");
+    }
+  };
+
+  const debounceSearch = (value, debounceTimeout) => {
+    clearTimeout(debounceTimeout);
+    const newTimerId = setTimeout(() => performSearch(value), 500);
+    updateTimerId(newTimerId);
+  };
 
   return (
     <Box
-      className="header"
       bgcolor="primary.main"
       display="flex"
       flexDirection="row"
       justifyContent="space-between"
       alignItems="center"
-      minHeight="5vh"
-      px={4}
+      px={3}
       py={2}
-      gap={2}
     >
       {/* Logo */}
       <Box className="header-title">
@@ -58,21 +48,23 @@ function Navbar() {
 
       {/* Search Bar */}
       <Box
-        flex={1}
         sx={{
-          paddingX: 2,
-          paddingY: 0.5,
+          flexGrow: 1,
+          display: "flex",
+          justifyContent: "center",
+          px: 2,
         }}
       >
         <TextField
           size="small"
-          fullWidth
           variant="outlined"
+          placeholder="Search for items / Search an album of your choice"
+          fullWidth
+          onChange={(e) => debounceSearch(e.target.value, timerId)}
           sx={{
             backgroundColor: "white",
             borderRadius: 1,
-            maxWidth: "600px", // Limit on large screens
-            width: { xs: "100%", sm: "400px", md: "500px" },
+            maxWidth: "600px",
           }}
           InputProps={{
             endAdornment: (
@@ -81,11 +73,6 @@ function Navbar() {
               </InputAdornment>
             ),
           }}
-          placeholder="Search for items/Search a album of your choice"
-          name="search"
-          onChange={(e) => {
-                debounceSearch(e.target.value, timerId);
-              }}
         />
       </Box>
 

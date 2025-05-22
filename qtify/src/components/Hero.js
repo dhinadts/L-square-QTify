@@ -10,7 +10,7 @@ const Hero = () => {
       alignItems="center"
       sx={(theme) => ({
         height: 270,
-        width: "100%",
+        // width: "100%",
         backgroundColor: theme.palette.primary.dark,
         px: 4,
       })}
@@ -31,7 +31,7 @@ const Hero = () => {
           src="/assets/hero_headphones.png"
           alt="hero"
           height="212"
-          style={{ maxWidth: "100%", objectFit: "contain" }}
+          style={{ /* maxWidth: "100%", */ objectFit: "contain" }}
         />
       </Box>
     </Box>

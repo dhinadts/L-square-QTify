@@ -1,6 +1,6 @@
 import Navbar from "./NavBar";
 import Hero from "./Hero";
-import Header from "./Header";
+// import Header from "./Header";
 import { Search, SentimentDissatisfied } from "@mui/icons-material";
 import {
   CircularProgress,
@@ -12,6 +12,7 @@ import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
+import AlbumList from "./AlbumList";
 
 const Home = () => {
   /* const { enqueueSnackbar } = useSnackbar();
@@ -27,7 +28,8 @@ const Home = () => {
     <Box display="flex" flexDirection={"column"}>
       <Navbar />
       <Hero />
-      <Header />
+      <AlbumList title="Top Albums" />
+      <AlbumList title="New Albums" />
     </Box>
   );
 };
