@@ -1,222 +1,224 @@
 import axios from "axios";
 import {
   Box,
-  Card,
+  Tabs,
+  Tab,
   Button,
-  Grid,
-  CardActionArea,
-  CardContent,
-  CardMedia,
   CircularProgress,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-
+import styles from "./AlbumList.module.css"; // Import CSS module
+import theme from "../theme";
+import CardItem from "./CardItem";
 const AlbumList = ({ title }) => {
-  const [songs, setAlbums] = useState([]);
+  const [albums, setAlbums] = useState([]);
+  const [songs, setSongs] = useState([]);
   const [showAll, setShowAll] = useState(false);
-  const visibleSongs = showAll ? songs : songs.slice(0, 7);
+  const [categories, setCategories] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const fetchGenres = async () => {
+    try {
+      const res = await axios.get("https://qtify-backend-labs.crio.do/genres");
+      setCategories(res.data.data);
+    } catch (err) {
+      console.error("Genre fetch error:", err);
+    }
+  };
 
   const GetList = async () => {
-    let endPoint = title === "Top Albums" ? "top" : "new";
-    let url = `https://qtify-backend-labs.crio.do/albums/${endPoint}`;
     try {
+      const url =
+        title === "Songs"
+          ? `https://qtify-backend-labs.crio.do/songs`
+          : `https://qtify-backend-labs.crio.do/albums/${
+              title === "Top Albums" ? "top" : "new"
+            }`;
+
       const response = await axios.get(url);
-      setAlbums(response.data);
-      console.log(response.data[0]);
+      if (title === "Songs") {
+        setSongs(response.data);
+        await fetchGenres(); // Only fetch genres for songs
+      } else {
+        setAlbums(response.data);
+      }
     } catch (error) {
       console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     GetList();
-  }, []);
-  const onClick = (song) => {
-    console.log(song);
+  });
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
-  const CardItem = ({ song, title }) => {
-    return (
-      <>
-        <Card
-          item
+  // Filter songs based on selected genre
+  const filteredSongs =
+    title === "Songs" && categories.length > 0
+      ? songs.filter(
+          (song) =>
+            activeTab === 0 ||
+            song.genre.label === categories[activeTab - 1]?.label
+        )
+      : songs;
+
+  const listToRender = title === "Songs" ? filteredSongs : albums;
+
+  const GenreTabs = () => (
+    <Box
+      sx={{
+        width: "100%",
+        color: "white",
+        bgcolor: "primary.dark",
+        mb: 2,
+        display: "flex",
+        justifyContent: "flex-start",
+      }}
+    >
+      <Tabs
+        value={activeTab}
+        onChange={handleTabChange}
+        variant="scrollable"
+        scrollButtons
+        TabIndicatorProps={{ style: { backgroundColor: "white" } }}
+        allowScrollButtonsMobile
+      >
+        <Tab
+          key="all"
+          label="All"
           sx={{
-            display: "flex",
-            width: 150,
-            flexDirection: "column",
-            bgcolor: "primary.dark",
-            py: 2,
-            px: 2,
+            color: "white",
+            "&.Mui-selected": {
+              color: theme.palette.secondary.main || "cyan", // highlight selected
+            },
           }}
-        >
-          <Card
+        />
+        {categories.map((genre) => (
+          <Tab
+            label={genre.label}
             sx={{
-              height: 150,
-              width: "100%",
-              backgroundColor: "#fff",
-              borderRadius: 4,
-              boxShadow: 2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              overflow: "hidden",
-              position: "relative",
-              paddingBottom: 2,
+              color: "white",
+              "&.Mui-selected": {
+                color: theme.palette.secondary.main || "cyan",
+              },
             }}
-          >
-            {}
-            <CardMedia
-              component="img"
-              image={song.image}
-              alt={song.title}
-              sx={{
-                width: "100%",
-                height: 120,
-                objectFit: "cover",
-              }}
-            />
+          />
+        ))}
+      </Tabs>
+    </Box>
+  );
 
-            {}
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: "30%",
-                width: "100%",
-                backgroundColor: "transparent",
-                color: "white",
-                textAlign: "center",
-                textWrap: true,
-                py: 0.5,
-              }}
-            >
-              <Typography variant="subtitle1" fontWeight="bold" flexWrap={true}>
-                {song.title}
-              </Typography>
-            </Box>
-
-            {}
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 8,
-                left: 8,
-                backgroundColor: "#000",
-                color: "#fff",
-                borderRadius: "8px",
-                padding: "2px 8px",
-                fontSize: "12px",
-              }}
-            >
-              {song.follows} follows
-            </Box>
-          </Card>
-          <Typography
-            variant="subtitle1"
-            fontWeight="bold"
-            flexWrap={true}
-            color="white"
-          >
-            New Bollywood
-          </Typography>{" "}
-        </Card>
-      </>
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
     );
-  };
+  }
 
   return (
-    <>
-      {songs.length === 0 ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="200px"
-        >
-          <CircularProgress />
+    <Box
+      className={styles.wrapper}
+      sx={{
+        backgroundColor: theme.palette.primary.dark,
+        color: theme.palette.primary.main,
+      }}
+    >
+      <Box className={styles.header}>
+        <Typography variant="h5" color="white">
+          {title}
+        </Typography>
+        <Button variant="text" onClick={() => setShowAll((prev) => !prev)}>
+          {showAll ? "Collapse" : "Show More"}
+        </Button>
+      </Box>
+
+      {title === "Songs" && <GenreTabs />}
+
+      {showAll ? (
+        <Box className={styles.cardContainer}>
+          {listToRender.map((song) => (
+            <Box key={song.id} className={styles.cardWrapper}>
+              <CardItem song={song} title={title} />
+            </Box>
+          ))}
         </Box>
       ) : (
         <Box
           sx={{
-            margin: "0 auto",
-            width: "98vw",
-            paddingY: 2,
-            paddingX: 2,
-            backgroundColor: "primary.dark",
-            color: "white",
+            position: "relative",
+            backgroundColor: theme.palette.primary.dark,
+            color: theme.palette.primary.main,
           }}
         >
-          <Box sx={{ mx: "auto", py: 4, width: "100%" }}>
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 2, // 16px spacing
-                justifyContent: "space-between",
-              }}
-            >
-              {" "}
-              <Typography variant="h5" mb={2}>
-                {title}
-              </Typography>{" "}
-              <Box textAlign="center" mt={3}>
-                <Button
-                  variant="text"
-                  onClick={() => setShowAll((prev) => !prev)}
-                >
-                  {showAll ? "Collapse" : "Show More"}
-                </Button>
-              </Box>{" "}
-            </Box>
-          </Box>
-          {showAll ? (
-            <Grid container spacing={4} gap={2} width={"100%"}>
-              {visibleSongs.map((song) => (
-                <Box
-                  key={song.id}
-                  sx={{
-                    width: `calc((100% - 6 * 16px) / 7)`, // 7 items per row, 6 gaps of 16px
-                  }}
-                >
-                  <CardItem song={song} />
-                </Box>
-              ))}
-            </Grid>
-          ) : (
-            <Swiper
-              modules={[Navigation]}
-              navigation
-              spaceBetween={20}
-              slidesPerView={7}
-              breakpoints={{
-                0: {
-                  slidesPerView: 3,
-                },
-                600: {
-                  slidesPerView: 5,
-                },
-                900: {
-                  slidesPerView: 5,
-                },
-                1200: {
-                  slidesPerView: 7,
-                },
-              }}
-            >
-              {songs.map((song) => (
-                <SwiperSlide key={song.id}>
-                  <CardItem song={song} title={title} />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          )}
+          {/* Left Arrow */}
+          <img
+            src="/assets/LeftArrow.svg"
+            alt="Prev"
+            className="swiper-button-prev-custom"
+            style={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              cursor: "pointer",
+              width: 40,
+            }}
+          />
+
+          {/* Right Arrow */}
+          <img
+            src="/assets/RightArrow.svg"
+            alt="Next"
+            className="swiper-button-next-custom"
+            style={{
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 2,
+              cursor: "pointer",
+              width: 40,
+            }}
+          />
+          <Swiper
+            modules={[Navigation]}
+            navigation
+            spaceBetween={20}
+            slidesPerView={7}
+            breakpoints={{
+              0: { slidesPerView: 3 },
+              600: { slidesPerView: 5 },
+              900: { slidesPerView: 5 },
+              1200: { slidesPerView: 7 },
+            }}
+          >
+            {listToRender.map((song) => (
+              <SwiperSlide key={song.id}>
+                <CardItem song={song} title={title} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </Box>
       )}
-    </>
+    </Box>
   );
 };
 
