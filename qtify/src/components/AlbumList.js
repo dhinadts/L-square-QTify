@@ -15,6 +15,8 @@ import { Navigation } from "swiper/modules";
 import styles from "./AlbumList.module.css"; // Import CSS module
 import theme from "../theme";
 import CardItem from "./CardItem";
+import stylesB from "./CustomButton.module.css";
+
 const AlbumList = ({ title }) => {
   const [albums, setAlbums] = useState([]);
   const [songs, setSongs] = useState([]);
@@ -145,8 +147,10 @@ const AlbumList = ({ title }) => {
           {title}
         </Typography>
         {title === 'Songs' ? (<></>) :
-        (<Button variant="text" onClick={() => setShowAll((prev) => !prev)}>
-          {showAll ? "Collapse" : "Show More"}
+        (<Button 
+        className={stylesB.button}
+        variant="text" onClick={() => setShowAll((prev) => !prev)}>
+          {showAll ? "Collapse" : "Show All"}
         </Button>)}
       </Box>
 

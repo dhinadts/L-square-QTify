@@ -11,10 +11,11 @@ const CustomButton = ({ name = "Give Feedback", onClick }) => {
           onClick={onClick}
           className={styles.button}
           sx={{
+            fontFamily: "Poppins, sans-serif",
             backgroundColor: theme.palette.primary.dark,
             color: theme.palette.primary.main,
             "&:hover": {
-              backgroundColor: theme.palette.primary.dark ,
+              backgroundColor: theme.palette.primary.dark,
             },
           }}
         >
