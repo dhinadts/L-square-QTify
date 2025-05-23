@@ -144,9 +144,10 @@ const AlbumList = ({ title }) => {
         <Typography variant="h5" color="white">
           {title}
         </Typography>
-        <Button variant="text" onClick={() => setShowAll((prev) => !prev)}>
+        {title === 'Songs' ? (<></>) :
+        (<Button variant="text" onClick={() => setShowAll((prev) => !prev)}>
           {showAll ? "Collapse" : "Show More"}
-        </Button>
+        </Button>)}
       </Box>
 
       {title === "Songs" && <GenreTabs />}
