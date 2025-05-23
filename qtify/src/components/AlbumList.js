@@ -199,17 +199,20 @@ const AlbumList = ({ title }) => {
             }}
           />
           <Swiper
-            modules={[Navigation]}
-            navigation
-            spaceBetween={20}
-            slidesPerView={7}
-            breakpoints={{
-              0: { slidesPerView: 3 },
-              600: { slidesPerView: 5 },
-              900: { slidesPerView: 5 },
-              1200: { slidesPerView: 7 },
-            }}
-          >
+  modules={[Navigation]}
+  navigation={{
+    nextEl: '.swiper-button-next-custom',
+    prevEl: '.swiper-button-prev-custom',
+  }}
+  spaceBetween={20}
+  slidesPerView={7}
+  breakpoints={{
+    0: { slidesPerView: 3 },
+    600: { slidesPerView: 5 },
+    900: { slidesPerView: 5 },
+    1200: { slidesPerView: 7 },
+  }}
+>
             {listToRender.map((song) => (
               <SwiperSlide key={song.id}>
                 <CardItem song={song} title={title} />
