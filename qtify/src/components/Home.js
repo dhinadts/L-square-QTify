@@ -10,10 +10,9 @@ const Home = () => {
     <Box display="flex" flexDirection={"column"}>
       <Navbar />
       <Hero />
-      <AlbumList title="Songs" />
-
       <AlbumList title="Top Albums" />
       <AlbumList title="New Albums" />
+      <AlbumList title="Songs" />
     </Box>
   );
 };
