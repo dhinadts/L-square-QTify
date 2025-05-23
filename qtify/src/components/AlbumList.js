@@ -2,6 +2,8 @@ import axios from "axios";
 import {
   Box,
   Card,
+  Button,
+  Grid,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -16,6 +18,8 @@ import { Navigation } from "swiper/modules";
 
 const AlbumList = ({ title }) => {
   const [songs, setAlbums] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+  const visibleSongs = showAll ? songs : songs.slice(0, 7);
 
   const GetList = async () => {
     let endPoint = title === "Top Albums" ? "top" : "new";
@@ -142,38 +146,74 @@ const AlbumList = ({ title }) => {
             width: "98vw",
             paddingY: 2,
             paddingX: 2,
+            backgroundColor: "primary.dark",
+            color: "white",
           }}
         >
-          <Typography variant="h5" mb={2} align="left">
-            {title}
-          </Typography>
-          <Swiper
-            modules={[Navigation]}
-            navigation
-            spaceBetween={20}
-            slidesPerView={7}
-            breakpoints={{
-              0: {
-                slidesPerView: 3,
-              },
-              600: {
-                slidesPerView: 5,
-              },
-              900: {
-                slidesPerView: 5,
-              },
-              1200: {
-                slidesPerView: 7,
-              },
-            }}
-          >
-            {songs.map((song) => (
-              <SwiperSlide key={song.id}>
-                <CardItem song={song} title={title} />
-                {}
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          <Box sx={{ mx: "auto", py: 4, width: "100%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2, // 16px spacing
+                justifyContent: "space-between",
+              }}
+            >
+              {" "}
+              <Typography variant="h5" mb={2}>
+                {title}
+              </Typography>{" "}
+              <Box textAlign="center" mt={3}>
+                <Button
+                  variant="text"
+                  onClick={() => setShowAll((prev) => !prev)}
+                >
+                  {showAll ? "Collapse" : "Show More"}
+                </Button>
+              </Box>{" "}
+            </Box>
+          </Box>
+          {showAll ? (
+            <Grid container spacing={4} gap={2} width={"100%"}>
+              {visibleSongs.map((song) => (
+                <Box
+                  key={song.id}
+                  sx={{
+                    width: `calc((100% - 6 * 16px) / 7)`, // 7 items per row, 6 gaps of 16px
+                  }}
+                >
+                  <CardItem song={song} />
+                </Box>
+              ))}
+            </Grid>
+          ) : (
+            <Swiper
+              modules={[Navigation]}
+              navigation
+              spaceBetween={20}
+              slidesPerView={7}
+              breakpoints={{
+                0: {
+                  slidesPerView: 3,
+                },
+                600: {
+                  slidesPerView: 5,
+                },
+                900: {
+                  slidesPerView: 5,
+                },
+                1200: {
+                  slidesPerView: 7,
+                },
+              }}
+            >
+              {songs.map((song) => (
+                <SwiperSlide key={song.id}>
+                  <CardItem song={song} title={title} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </Box>
       )}
     </>
